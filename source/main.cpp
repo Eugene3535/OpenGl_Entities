@@ -20,8 +20,8 @@ glm::ivec2 screen_size = glm::ivec2(1200, 800);
 int main()
 {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow* window = glfwCreateWindow(screen_size.x, screen_size.y, "OpenGL Entities", NULL, NULL);
@@ -44,18 +44,18 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Texture* tileset = GetTexture("main_tileset.png");
-    Texture* characters = GetTexture("Characters_1.png");
+    Texture* tileset = GetTexture("res/textures/main_tileset.png");
+    Texture* characters = GetTexture("res/textures/Characters_1.png");
 
     TileMap level(&screen_size);
-    level.load("Levels/Map_1.tmx", tileset);
+    level.load("res/levels/Map_1.tmx", tileset);
 
     glm::mat4 projection(1.0f);
     projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, 0.0f, 1.0f);
     
     ShaderProgram tilemap_shader;
-    tilemap_shader.compile("Shaders/tilemap_shader.vert", GL_VERTEX_SHADER);
-    tilemap_shader.compile("Shaders/tilemap_shader.frag", GL_FRAGMENT_SHADER);
+    tilemap_shader.compile("res/shaders/tilemap_shader.vert", GL_VERTEX_SHADER);
+    tilemap_shader.compile("res/shaders/tilemap_shader.frag", GL_FRAGMENT_SHADER);
     tilemap_shader.addUniform("view");
     tilemap_shader.addUniform("projection");
 
@@ -63,8 +63,8 @@ int main()
     tilemap_shader.setUniform("projection", glm::value_ptr(projection));
 
     ShaderProgram sprite_shader;
-    sprite_shader.compile("Shaders/sprite_shader.vert", GL_VERTEX_SHADER);
-    sprite_shader.compile("Shaders/sprite_shader.frag", GL_FRAGMENT_SHADER);
+    sprite_shader.compile("res/shaders/sprite_shader.vert", GL_VERTEX_SHADER);
+    sprite_shader.compile("res/shaders/sprite_shader.frag", GL_FRAGMENT_SHADER);
     sprite_shader.addUniform("model");
     sprite_shader.addUniform("projection");
 

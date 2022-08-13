@@ -96,7 +96,7 @@ Texture* GetTexture(const std::string_view file_name)
     if (auto found = textures.find(file_name); found != textures.end())
         return &found->second;
     else  
-        textures[file_name].loadFromFile("Textures/" + std::string(file_name));  
+        textures[file_name].loadFromFile(std::string(file_name));  
 
     return &textures[file_name];
 }
