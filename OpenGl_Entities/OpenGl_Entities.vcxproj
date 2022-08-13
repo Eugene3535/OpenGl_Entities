@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClInclude Include="..\source\Animation.hpp" />
     <ClInclude Include="..\source\Color.hpp" />
-    <ClInclude Include="..\source\Geometry.hpp" />
+    <ClInclude Include="..\source\Rectangle.hpp" />
     <ClInclude Include="..\source\ShaderProgram.hpp" />
     <ClInclude Include="..\source\Sprite.hpp" />
     <ClInclude Include="..\source\stb_image.h" />

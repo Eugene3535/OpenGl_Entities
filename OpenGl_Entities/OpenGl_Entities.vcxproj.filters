@@ -21,7 +21,7 @@
     <ClInclude Include="..\source\Color.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\Geometry.hpp">
+    <ClInclude Include="..\source\Rectangle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ShaderProgram.hpp">

@@ -8,7 +8,7 @@
 #include "Texture.hpp"
 #include "Color.hpp"
 #include "ShaderProgram.hpp"
-#include "Geometry.hpp"
+#include "Rectangle.hpp"
 
 class Sprite
 {
@@ -17,7 +17,7 @@ public:
     ~Sprite();
 
     void setTexture(Texture* tex);
-    void setTextureRect(const HitBox& rect);
+    void setTextureRect(const glm::fRect& rect);
 
     void move(float offsetX, float offsetY);
     void setPosition(float dx, float dy);

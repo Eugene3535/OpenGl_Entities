@@ -52,7 +52,7 @@ int main()
 
     glm::mat4 projection(1.0f);
     projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, 0.0f, 1.0f);
-
+    
     ShaderProgram tilemap_shader;
     tilemap_shader.compile("Shaders/tilemap_shader.vert", GL_VERTEX_SHADER);
     tilemap_shader.compile("Shaders/tilemap_shader.frag", GL_FRAGMENT_SHADER);

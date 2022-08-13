@@ -4,7 +4,7 @@
 
 #include "Texture.hpp"
 #include "Sprite.hpp"
-#include "Geometry.hpp"
+#include "Rectangle.hpp"
 
 #include <string_view>
 #include <vector>
@@ -24,7 +24,7 @@ struct AnimationData
 	std::size_t         end           = 0;
 	float               delay         = 0;
 	float               elapsed_time  = 0;
-	std::vector<HitBox> frames;
+	std::vector<glm::fRect> frames;
 };
 
 // Sprite with only one linear animation
@@ -40,7 +40,7 @@ public:
 		data.frames.reserve(duration);
 
 		for (std::size_t i = 0; i < duration; ++i)
-			data.frames.emplace_back(std::move(HitBox(x + i * width, y, width, height)));
+			data.frames.emplace_back(x + i * width, y, width, height);
 
 		setTexture(texture);
 		setTextureRect(data.frames[0]);
@@ -100,7 +100,7 @@ public:
 		data.frames.reserve(duration);
 
 		for (std::size_t i = 0; i < duration; ++i)
-			data.frames.emplace_back(std::move(HitBox(x + i * width, y, width, height)));
+			data.frames.emplace_back(x + i * width, y, width, height);
 		
 		anim_list.emplace(name, std::move(data));
 		set(name);

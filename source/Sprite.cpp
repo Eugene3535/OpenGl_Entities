@@ -12,7 +12,7 @@ Sprite::Sprite():
     scale(1.0f),
     angle(0)
 {
-    GLfloat vertices[] =
+    GLfloat vertices[] 
     {
         0.0f, 0.0f, 
         1.0f, 0.0f,  
@@ -28,7 +28,7 @@ Sprite::Sprite():
         Color::WHITE
     };
 
-    GLfloat tex_coords[] =
+    GLfloat tex_coords[] 
     {
         0.0f, 0.0f,
         1.0f, 0.0f,
@@ -83,14 +83,14 @@ void Sprite::setTexture(Texture* tex)
     transform_need_update = true;
 }
 
-void Sprite::setTextureRect(const HitBox& rect)
+void Sprite::setTextureRect(const glm::fRect& rect)
 {
     GLfloat vertices[] = 
     {
-        0.0f,   0.0f,   
-        rect.z, 0.0f,   
-        rect.z, rect.w,  
-        0,      rect.w 
+        0.0f,       0.0f,   
+        rect.width, 0.0f,   
+        rect.width, rect.height,  
+        0.0f,       rect.height 
     };
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
@@ -99,10 +99,10 @@ void Sprite::setTextureRect(const HitBox& rect)
     float tex_width  = (float)texture->getSize().x;
     float tex_height = (float)texture->getSize().y;
 
-    float left   = rect.x / tex_width;
-    float top    = rect.y / tex_height;
-    float right  = (rect.x + rect.z) / tex_width;
-    float bottom = (rect.y + rect.w) / tex_height;
+    float left   = rect.left / tex_width;
+    float top    = rect.top / tex_height;
+    float right  = (rect.left + rect.width) / tex_width;
+    float bottom = (rect.top + rect.height) / tex_height;
 
     GLfloat tex_coords[] =
     {
@@ -192,7 +192,7 @@ void Sprite::render(ShaderProgram* shader)
 
     if (transform_need_update)
     {
-        glm::mat4 transform_matrix(1.0f);
+        glm::mat4 transform_matrix(1.0f); 
         transform_matrix = glm::translate(transform_matrix, glm::vec3(position, 0.0f));
 
         transform_matrix = glm::translate(transform_matrix, glm::vec3(0.5f * scale.x, 0.5f * scale.x, 0.0f));

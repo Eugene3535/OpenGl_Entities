@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "Texture.hpp"
-#include "Geometry.hpp"
+#include "Rectangle.hpp"
 #include "ShaderProgram.hpp"
 
 #include <string>
@@ -22,7 +22,7 @@ struct Object
 
 	std::string           name;
 	std::string           type;
-	HitBox                bounds;
+	glm::fRect            bounds;
 	std::vector<Property> properties;
 };
 

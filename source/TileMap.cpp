@@ -185,7 +185,7 @@ bool TileMap::load(const char* tmx_file_path, Texture* texture)
 			Object obj;
 			obj.name = object_name;
 			obj.type = object_type;
-			obj.bounds = HitBox(x, y, width, height);
+			obj.bounds = glm::fRect(x, y, width, height);
 
 			auto properties = object->FirstChildElement("properties");
 
