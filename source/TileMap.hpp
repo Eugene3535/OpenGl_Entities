@@ -28,9 +28,10 @@ struct Object
 
 struct Layer
 {
-	GLuint VAO;
-	GLuint VBO;
-	size_t size;
+	GLuint VAO = 0;
+	GLuint VBO = 0;
+	GLuint EBO = 0;
+	GLuint size = 0;
 };
 
 class TileMap

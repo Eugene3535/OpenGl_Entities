@@ -38,15 +38,15 @@ bool TileMap::load(const char* tmx_file_path, Texture* texture)
 
 	tinyxml2::XMLElement* root_element = document.FirstChildElement("map");
 
-	const unsigned map_width    = std::atoi(root_element->Attribute("width"));
-	const unsigned map_height   = std::atoi(root_element->Attribute("height"));
-	const unsigned tile_count   = map_width * map_height;
+	const GLuint map_width    = std::atoi(root_element->Attribute("width"));
+	const GLuint map_height   = std::atoi(root_element->Attribute("height"));
+	const GLuint tile_count   = map_width * map_height;
 
-	const unsigned tile_width   = std::atoi(root_element->Attribute("tilewidth"));
-	const unsigned tile_height  = std::atoi(root_element->Attribute("tileheight"));
+	const GLuint tile_width   = std::atoi(root_element->Attribute("tilewidth"));
+	const GLuint tile_height  = std::atoi(root_element->Attribute("tileheight"));
 
-	const unsigned row_count    = tileset->getSize().y / tile_height;
-	const unsigned column_count = tileset->getSize().x / tile_width;
+	const GLuint row_count    = tileset->getSize().y / tile_height;
+	const GLuint column_count = tileset->getSize().x / tile_width;
 	
 	const glm::uvec2 tex_size   = tileset->getSize();
 
@@ -84,48 +84,60 @@ bool TileMap::load(const char* tmx_file_path, Texture* texture)
 		current_layer.shrink_to_fit();
 
 		std::vector<glm::vec4> vertices;  // vec4 = vec2(vertices) + vec2(tex_coords)
-		vertices.reserve(tile_count * 6); // Set of tiles * 2 triangles composed by 3 vertices
+		vertices.reserve(tile_count * 4); 
 
-		for (size_t y = 0u; y < map_height; ++y)
+		std::vector<GLuint> indices;  
+		indices.reserve(tile_count * 4); // two triangles composed by 3 vertices
+
+		GLuint tile_num = 0;
+
+		for (GLuint y = 0u; y < map_height; ++y)
 		{
-			for (size_t x = 0u; x < map_width; ++x)
+			for (GLuint x = 0u; x < map_width; ++x)
 			{
-				unsigned index = x + y * map_width;
-				unsigned tile_id = current_layer[index];
+				GLuint index = x + y * map_width;
+				GLuint tile_id = current_layer[index];
 		
-				if (tile_id) // Zero value means that current tile is dropped
+				if (tile_id) // Zero value means that current tile is empty
 				{
-					const glm::vec2& tex_coords = texture_grid[tile_id - 1]; // Numbering a tile in TME layers always starts at 1, that`s why offset -1
+					const glm::vec2& tex_coords = texture_grid[tile_id - 1]; 
 
 					float left   = tex_coords.x / tex_size.x;
 					float top    = tex_coords.y / tex_size.y;
 					float right  = (tex_coords.x + tile_width)  / tex_size.x;
 					float bottom = (tex_coords.y + tile_height) / tex_size.y;
 
-					glm::vec4 quad[]
-					{// First triangle
-						{ x * tile_width,              y * tile_height + tile_height, left, bottom  }, 
-						{ x * tile_width + tile_width, y * tile_height + tile_height, right, bottom }, 
-						{ x * tile_width + tile_width, y * tile_height,               right, top    }, 
-					 // Second triangle
-						{ x * tile_width,              y * tile_height + tile_height, left, bottom  }, 
-						{ x * tile_width + tile_width, y * tile_height,               right, top    }, 
-						{ x * tile_width,              y * tile_height,               left, top     }      
-					};
+					// Quad
+					vertices.push_back({ x * tile_width,              y * tile_height + tile_height, left,  bottom });
+					vertices.push_back({ x * tile_width + tile_width, y * tile_height + tile_height, right, bottom });
+					vertices.push_back({ x * tile_width + tile_width, y * tile_height,               right, top    });
+					vertices.push_back({ x * tile_width,              y * tile_height,               left,  top    });
 
-					for (auto&& vertex : quad)
-						vertices.emplace_back(std::move(vertex));
+					// 1-st triangle
+					indices.push_back(tile_num);
+					indices.push_back(tile_num + 1);
+					indices.push_back(tile_num + 2);
+
+					// 2-nd triangle
+					indices.push_back(tile_num);
+					indices.push_back(tile_num + 2);
+					indices.push_back(tile_num + 3);
+
+					tile_num += 4;
 				}
 			}
 		}
-		vertices.shrink_to_fit();
 
-		GLuint VAO = 0, VBO = 0;
+		GLuint VAO = 0, VBO = 0, EBO = 0;
+
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
 		glBindVertexArray(VAO);
+
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), NULL);
 		glEnableVertexAttribArray(0);
@@ -133,10 +145,13 @@ bool TileMap::load(const char* tmx_file_path, Texture* texture)
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)* indices.size(), indices.data(), GL_STATIC_DRAW);
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);		
 
-		layers.push_back(Layer({ VAO, VBO, vertices.size() }));
+		layers.push_back({ VAO, VBO, EBO, static_cast<GLuint>(indices.size()) });
 	}
 
     // Objects
@@ -205,7 +220,7 @@ void TileMap::setViewport(const glm::vec2& center)
 	float ratioX = bounds.x / screen_size->x;
 	float ratioY = bounds.y / screen_size->y;
 	// Shift the map relatively window
-	position = { -center.x * ratioX + screen_size->x, -center.y * ratioY + screen_size->y / 2 };
+	position = { -center.x * ratioX + screen_size->x, -center.y * ratioY + screen_size->y * 0.5f };
 
 	viewport_need_update = true;	
 }
@@ -228,7 +243,7 @@ void TileMap::render(ShaderProgram* shader)
 	for (auto& layer : layers)
 	{
 		glBindVertexArray(layer.VAO);
-		glDrawArrays(GL_TRIANGLES, 0, layer.size);
+		glDrawElements(GL_TRIANGLES, layer.size, GL_UNSIGNED_INT, nullptr);
 		glBindVertexArray(0);
 	}
 			
